@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production Ticket Form</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <!-- Custom Styles -->
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            margin-top: 30px;
+        }
+
+        .ticket-form {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #343a40;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        label {
+            font-weight: 500;
+            color: #495057;
+        }
+
+        input[readonly] {
+            background-color: #e9ecef !important;
+            cursor: not-allowed !important;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+
+        .btn-primary:hover {
+            background-color: #0069d9;
+            border-color: #0062cc;
+        }
+
+        /* Custom CSS for a cleaner look */
+        .form-control:focus {
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        .form-group select.form-control {
+            appearance: none; /* Remove default arrow */
+            background-image: url('data:image/svg+xml;charset=UTF-8,<svg viewBox="0 0 12 6" fill="%23343a40" xmlns="http://www.w3.org/2000/svg"><path d="M10.293 0.293L6 4.586L1.707 0.293C1.317 -0.098 0.683 -0.098 0.293 0.293C-0.098 0.683 -0.098 1.317 0.293 1.707L5.293 6.707C5.683 7.098 6.317 7.098 6.707 6.707L11.707 1.707C12.098 1.317 12.098 0.683 11.707 0.293C11.317 -0.098 10.683 -0.098 10.293 0.293Z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 12px;
+            padding-right: 2.25rem;
+        }
+
+        /* Style for hidden "Other" input */
+        .other-input {
+            display: none;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="ticket-form">
+            <h1>Production Ticket Form</h1>
+            <form method="POST">
+                <div class="form-group">
+                    <label for="selected_name">Raised By:</label>
+                    <select class="form-control select2" id="selected_name" name="selected_name" required>
+                        <option value="">Select Option</option>
+                        {% for option in raised_by_options %}
+                            <option value="{{ option }}">{{ option }}</option>
+                        {% endfor %}
+                        <option value="other">Other (Specify)</option>
+                    </select>
+                    <input type="text" class="form-control other-input" id="other_selected_name" name="other_selected_name" placeholder="Enter Name">
+                </div>
+
+                <div class="form-group">
+                    <label for="date">Date:</label>
+                    <input type="text" class="form-control" id="date" name="date" value="{{ date }}" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="shift">Shift:</label>
+                    <input type="text" class="form-control" id="shift" name="shift" value="{{ shift }}" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="event_start_time">Event Start Time:</label>
+                    <input type="text" class="form-control" id="event_start_time" name="event_start_time" value="{{ event_start_time }}" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="line">Line:</label>
+                    <input type="text" class="form-control" id="line" name="line" value="L01" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="project">Project:</label>
+                    <input type="text" class="form-control" id="project" name="project" value="C3F" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="station">Section:</label>
+                    <input type="text" class="form-control" id="station" name="station" value="camera" readonly>
+                </div>
+
+                 <div class="form-group">
+                    <label for="qpl">QPL:</label>
+                    <select class="form-control select2" id="qpl" name="qpl" required>
+                        <option value="">Select QPL</option>
+                        {% for qpl_option in qpls %}
+                            <option value="{{ qpl_option }}">{{ qpl_option }}</option>
+                        {% endfor %}
+                         <option value="other">Other (Specify)</option>
+                    </select>
+                    <input type="text" class="form-control other-input" id="other_qpl" name="other_qpl" placeholder="Enter QPL">
+                </div>
+
+                <div class="form-group">
+                    <label for="issue_description">Issue Description:</label>
+                    <select class="form-control" id="issue_description" name="issue_description" required>
+                        <option value="">Select Issue</option>
+                        {% for section, issues in issue_descriptions.items() %}
+                            <optgroup label="{{ section }}">
+                                {% for issue in issues %}
+                                    <option value="{{ issue }}">{{ issue }}</option>
+                                {% endfor %}
+                            </optgroup>
+                        {% endfor %}
+                        <option value="other">Other (Specify)</option>
+                    </select>
+                    <textarea class="form-control other-input" id="other_issue_description" name="other_issue_description" placeholder="Enter Issue Description" rows="3"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">Submit Ticket</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.select2').select2({
+                placeholder: 'Select an option',
+                allowClear: true
+            });
+
+            // Function to toggle visibility of "Other" input
+            function toggleOtherInput(selectElement, inputElement) {
+                selectElement.on('change', function() {
+                    if (this.value === 'other') {
+                        inputElement.show();
+                        inputElement.prop('required', true);
+                    } else {
+                        inputElement.hide();
+                        inputElement.prop('required', false);
+                    }
+                }).trigger('change'); // Trigger on page load in case a value is pre-selected
+            }
+
+            // Initialize toggling for each "Other" input
+            toggleOtherInput($('#selected_name'), $('#other_selected_name'));
+            //toggleOtherInput($('#line'), $('#other_line'));
+            //toggleOtherInput($('#project'), $('#other_project'));
+           // toggleOtherInput($('#station'), $('#other_station'));
+            toggleOtherInput($('#qpl'), $('#other_qpl'));
+
+
+           //Issue Description
+            const issueDescriptionSelect = $('#issue_description');
+            const otherIssueDescriptionInput = $('#other_issue_description');
+
+            issueDescriptionSelect.on('change', function() {
+                if (this.value === 'other') {
+                    otherIssueDescriptionInput.show();
+                    otherIssueDescriptionInput.prop('required', true);
+                } else {
+                    otherIssueDescriptionInput.hide();
+                    otherIssueDescriptionInput.prop('required', false);
+                }
+            }).trigger('change');
+        });
+    </script>
+</body>
+</html>

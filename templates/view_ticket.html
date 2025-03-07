@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Ticket</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0; /* Reset margin */
+            background-color: #f4f4f4; /* Light background */
+            color: #333; /* Darker text for readability */
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50; /* A more professional heading color */
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #3498db; /* Accent color for section titles */
+            margin-top: 30px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 8px;
+        }
+
+        /* Section Styles */
+        .production-details,
+        .engineering-details {
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background-color: #f9f9f9;
+        }
+
+        /* Detail Row Styles */
+        .detail-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .detail-row label {
+            width: 180px;
+            text-align: right;
+            margin-right: 15px;
+            font-weight: 600; /* Slightly bolder label text */
+            color: #555;
+        }
+
+        .detail-row input[type="text"],
+        .detail-row textarea,
+        .detail-row select {
+            width: 100%; /* Make inputs take full available width */
+            max-width: 400px; /* Set a maximum width */
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 15px;
+            color: #444;
+            transition: border-color 0.2s; /* Smooth transition for focus */
+        }
+
+        .detail-row textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        .detail-row input[disabled],
+        .detail-row textarea[disabled],
+        .detail-row select[disabled] {
+            background-color: #eee;
+            cursor: not-allowed;
+            border-color: #ddd;
+        }
+
+        .detail-row input[type="text"]:focus,
+        .detail-row textarea:focus,
+        .detail-row select:focus {
+            border-color: #3498db; /* Highlight on focus */
+            outline: none; /* Remove default focus outline */
+        }
+
+        /* Button Styles */
+        button[type="submit"] {
+            background-color: #27ae60; /* A nicer green */
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        button[type="submit"]:hover {
+            background-color: #219653; /* Darker green on hover */
+        }
+
+        /* Read-Only Style */
+        .read-only {
+            background-color: #ddd;
+            cursor: not-allowed;
+        }
+
+        /* Link Styles */
+        a {
+            display: inline-block;
+            margin-top: 15px;
+            color: #3498db;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            text-decoration: underline;
+            color: #2980b9;
+        }
+
+        /* Form Styles */
+        form {
+            margin-top: 20px;
+        }
+
+        /* Clearfix for floating elements (if needed) */
+        .clearfix::after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ticket Details</h1>
+
+        <section class="production-details">
+            <h2>Production Details</h2>
+            <div class="detail-row">
+                <label>Ticket Number:</label>
+                <input type="text" value="{{ ticket['ticket_number'] }}" disabled class="read-only">
+            </div>
+            <div class="detail-row">
+                <label>Raised By:</label>
+                <input type="text" value="{{ ticket['raised_by'] }}" disabled class="read-only">
+            </div>
+            <div class="detail-row">
+                <label>Start Time:</label>
+                <input type="text" value="{{ ticket['start_time'] }}" disabled class="read-only">
+            </div>
+            <div class="detail-row">
+                <label>Line:</label>
+                <input type="text" value="{{ ticket['line'] }}" disabled class="read-only">
+            </div>
+            <div class="detail-row">
+                <label>Project:</label>
+                <input type="text" value="{{ ticket['project'] }}" disabled class="read-only">
+            </div>
+            <div class="detail-row">
+                <label>Station:</label>
+                <input type="text" value="{{ ticket['station'] }}" disabled class="read-only">
+            </div>
+            <div class="detail-row">
+                <label>QPL:</label>
+                <input type="text" value="{{ ticket['qpl'] }}" disabled class="read-only">
+            </div>
+            <div class="detail-row">
+                <label>Section:</label>
+                <input type="text" value="{{ ticket['section'] }}" disabled class="read-only">
+            </div>
+        </section>
+
+        <form method="POST">
+            <section class="engineering-details">
+                <h2>SME response </h2>
+
+                <div class="detail-row">
+                    <label for="attended_by">Attended By:</label>
+                    <select id="attended_by" name="attended_by" {% if is_closed %}disabled{% endif %}>
+                        {% for option in engineer_options %}
+                            <option value="{{ option }}" {% if ticket['attended_by'] == option %}selected{% endif %}>{{ option }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="detail-row">
+                    <label for="status">Status:</label>
+                    <select id="status" name="status" {% if is_closed %}disabled{% endif %}>
+                        <option value="Open" {% if ticket['status'] == 'Open' %}selected{% endif %}>Open</option>
+                        <option value="In Progress" {% if ticket['status'] == 'In Progress' %}selected{% endif %}>In Progress</option>
+                        <option value="Closed" {% if ticket['status'] == 'Closed' %}selected{% endif %}>Closed</option>
+                    </select>
+                </div>
+
+                <div class="detail-row">
+                    <label for="issue_description">Issue Description:</label>
+                    <textarea id="issue_description" name="issue_description" {% if is_closed %}disabled{% endif %}>{{ ticket['issue_description'] }}</textarea>
+                </div>
+
+                <div class="detail-row">
+                    <label for="category">Category:</label>
+                    <select id="category" name="category" {% if is_closed %}disabled{% endif %}>
+                        <option value="Man" {% if ticket['category'] == 'Man' %}selected{% endif %}>Man</option>
+                        <option value="Software" {% if ticket['category'] == 'Software' %}selected{% endif %}>Software</option>
+                        <option value="Electrical" {% if ticket['category'] == 'Electrical' %}selected{% endif %}>Electrical</option>
+                        <option value="Mechanical" {% if ticket['category'] == 'Mechanical' %}selected{% endif %}>Mechanical</option>
+                    </select>
+                </div>
+
+                <div class="detail-row">
+                    <label for="root_cause">Root Cause:</label>
+                    <input type="text" id="root_cause" name="root_cause" value="{{ ticket['root_cause'] }}" {% if is_closed %}disabled{% endif %}>
+                </div>
+
+                <div class="detail-row">
+                    <label for="corrective_action">Corrective Action:</label>
+                    <input type="text" id="corrective_action" name="corrective_action" value="{{ ticket['corrective_action'] }}" {% if is_closed %}disabled{% endif %}>
+                </div>
+
+                <div class="detail-row">
+                    <label for="spares_required">Spares To Be Replace:</label>
+                    <input type="text" id="spares_required" name="spares_required" value="{{ ticket['spares_required'] }}" {% if is_closed %}disabled{% endif %}>
+                </div>
+            </section>
+
+            {% if not is_closed %}
+                <button type="submit">Update Ticket</button>
+            {% endif %}
+        </form>
+        <a href="{{ url_for('engineering_dashboard') }}">Back to Dashboard</a>
+    </div>
+</body>
+</html>
