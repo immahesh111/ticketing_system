@@ -168,8 +168,8 @@
                         {% endif %}
                     </td>
                     <td>
-                        {% if ticket.get('status') == 'Closed' and ticket.get('close_time') %}
-                            {{ ticket.get('close_time').strftime('%Y-%m-%d %H:%M:%S') }}
+                        {% if ticket.get('status') == 'Closed' and ticket.get('close_time_str') %}
+                            {{ ticket.get('close_time_str') }}
                         {% else %}
                             -
                         {% endif %}

@@ -161,8 +161,7 @@ def production_form():
 
     # Get current time in UTC
     utc_now = pytz.utc.localize(datetime.utcnow())
-
-    # Convert to Indian Standard Time (IST)
+    # Convert to Indian Standard Time (IST) for display
     ist_timezone = pytz.timezone('Asia/Kolkata')
     ist_now = utc_now.astimezone(ist_timezone)
 
@@ -534,7 +533,7 @@ def production_form():
         project = request.form['project']
         station = request.form['station']
         qpl = request.form['qpl']
-        issue_description = request.form['issue_description']  # ADDED
+        issue_description = request.form['issue_description']
 
         # Handle "Other" selections
         if selected_name == 'other':
@@ -548,18 +547,18 @@ def production_form():
         if qpl == 'other':
             qpl = request.form['other_qpl']
         if issue_description == 'other':
-            issue_description = request.form['other_issue_description']  # ADDED
+            issue_description = request.form['other_issue_description']
 
         new_ticket = {
             "ticket_number": generate_ticket_number(),
             "raised_by": selected_name,
-            "start_time": datetime.now(),
+            "start_time": datetime.utcnow(),  # Changed to UTC
             "line": line,
             "project": project,
             "station": station,
             "qpl": qpl,
             "section": section,
-            "issue_description": issue_description,  # ADDED
+            "issue_description": issue_description,
             "status": "Open",
             "close_time": None,
             "root_cause": None,
@@ -567,9 +566,7 @@ def production_form():
         }
         ticket_id = tickets_collection.insert_one(new_ticket).inserted_id
 
-        # Send email notification
         send_email_notification(new_ticket)
-
         return redirect(url_for('ticket_submitted', ticket_id=ticket_id))
 
     return render_template('production_form.html',
@@ -582,7 +579,7 @@ def production_form():
                            qpls=qpls,
                            raised_by_options=raised_by_options,
                            section=section,
-                           issue_descriptions=issue_descriptions)  # Pass the dictionary to the template
+                           issue_descriptions=issue_descriptions)
 
 @app.route('/ticket_submitted/<ticket_id>')
 @login_required
@@ -626,18 +623,25 @@ def engineering_dashboard():
         return redirect(url_for('engineering_login'))
 
     all_tickets = list(tickets_collection.find())
-
-    # Sort by status (Open, In Progress, Closed) and then by start_time (most recent first)
     sorted_tickets = sort_tickets(all_tickets)
+    ist_timezone = pytz.timezone('Asia/Kolkata')
 
-    # Extract date and time into separate fields for display
     for ticket in sorted_tickets:
         if ticket.get("start_time"):
-            ticket["start_date"] = ticket["start_time"].strftime('%Y-%m-%d')
-            ticket["start_time_only"] = ticket["start_time"].strftime('%H:%M:%S')
+            utc_start_time = ticket["start_time"].replace(tzinfo=pytz.utc)
+            ist_start_time = utc_start_time.astimezone(ist_timezone)
+            ticket["start_date"] = ist_start_time.strftime('%Y-%m-%d')
+            ticket["start_time_only"] = ist_start_time.strftime('%H:%M:%S')
         else:
             ticket["start_date"] = None
             ticket["start_time_only"] = None
+
+        if ticket.get("close_time"):
+            utc_close_time = ticket["close_time"].replace(tzinfo=pytz.utc)
+            ist_close_time = utc_close_time.astimezone(ist_timezone)
+            ticket["close_time_str"] = ist_close_time.strftime('%Y-%m-%d %H:%M:%S')
+        else:
+            ticket["close_time_str"] = None
 
     return render_template('engineering_dashboard.html', tickets=sorted_tickets)
 
@@ -648,47 +652,42 @@ def view_ticket(ticket_id):
         return redirect(url_for('engineering_login'))
 
     ticket = tickets_collection.find_one({"_id": ObjectId(ticket_id)})
-
     if not ticket:
         flash("Ticket not found.")
         return redirect(url_for('engineering_dashboard'))
 
-    is_closed = ticket.get('status') == 'Closed'
+    ist_timezone = pytz.timezone('Asia/Kolkata')
 
-    # Engineer Options
-    engineer_options = {"Day Shift": [
-                        "Vipin",
-                        "Harish",
-                        "Rajnish",
-                        "Ankur Sharma",
-                        "Zaheer",
-                        "Alam",
-                        "Dharmendra",
-                        "Debashish",
-                        "Anil",
-                        "Aditya Shukla",
-                        "suraj",
-                        "Vijay",
-                        "Roshan",
-                        "Bikash",
-                        "Prashant"],
-                        "Night Shift": [
-                        "Shivam",
-                        "Anupam",
-                        "Sachin",
-                        "Kehari",
-                        "Hitesh",
-                        "Arun"
-                        "Sushant",
-                        "Ankit",
-                        "Ravi",
-                        "Sabaj",
-                        "Rajesh",
-                        "Vibhishan",
-                        "Vakeel",
-                        "Bhagabat",
-                        "Aditya"]
-                        }
+    # Convert start_time to IST
+    if ticket.get("start_time"):
+        utc_start_time = ticket["start_time"].replace(tzinfo=pytz.utc)
+        ist_start_time = utc_start_time.astimezone(ist_timezone)
+        ticket["start_time_str"] = ist_start_time.strftime('%Y-%m-%d %H:%M:%S')
+    else:
+        ticket["start_time_str"] = None
+
+    # Convert close_time to IST
+    if ticket.get("close_time"):
+        utc_close_time = ticket["close_time"].replace(tzinfo=pytz.utc)
+        ist_close_time = utc_close_time.astimezone(ist_timezone)
+        ticket["close_time_str"] = ist_close_time.strftime('%Y-%m-%d %H:%M:%S')
+    else:
+        ticket["close_time_str"] = None
+
+    is_closed = ticket.get('status') == 'Closed'
+    engineer_options = {
+        "Day Shift": [
+            "Vipin", "Harish", "Rajnish", "Ankur Sharma", "Zaheer", "Alam",
+            "Dharmendra", "Debashish", "Anil", "Aditya Shukla", "suraj",
+            "Vijay", "Roshan", "Bikash", "Prashant"
+        ],
+        "Night Shift": [
+            "Shivam", "Anupam", "Sachin", "Kehari", "Hitesh", "Arun",
+            "Sushant", "Ankit", "Ravi", "Sabaj", "Rajesh", "Vibhishan",
+            "Vakeel", "Bhagabat", "Aditya"
+        ]
+    }
+
     if request.method == 'POST' and not is_closed:
         update_data = {
             "attended_by": request.form['attended_by'],
@@ -700,13 +699,22 @@ def view_ticket(ticket_id):
             "spares_required": request.form['spares_required'],
         }
         if request.form['status'] == 'Closed':
-            update_data['close_time'] = datetime.now()
+            update_data['close_time'] = datetime.utcnow()  # Store in UTC
         else:
             update_data['close_time'] = None
 
         tickets_collection.update_one({"_id": ObjectId(ticket_id)}, {"$set": update_data})
 
         ticket = tickets_collection.find_one({"_id": ObjectId(ticket_id)})
+        # Reconvert times after update
+        if ticket.get("start_time"):
+            utc_start_time = ticket["start_time"].replace(tzinfo=pytz.utc)
+            ist_start_time = utc_start_time.astimezone(ist_timezone)
+            ticket["start_time_str"] = ist_start_time.strftime('%Y-%m-%d %H:%M:%S')
+        if ticket.get("close_time"):
+            utc_close_time = ticket["close_time"].replace(tzinfo=pytz.utc)
+            ist_close_time = utc_close_time.astimezone(ist_timezone)
+            ticket["close_time_str"] = ist_close_time.strftime('%Y-%m-%d %H:%M:%S')
         is_closed = ticket.get('status') == 'Closed'
         flash('Ticket updated successfully!')
         return render_template('view_ticket.html', ticket=ticket, is_closed=is_closed, engineer_options=engineer_options)
