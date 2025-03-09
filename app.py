@@ -7,7 +7,6 @@ import logging
 from pymongo import MongoClient
 from bson import ObjectId
 import certifi
-import pytz
 
 # Import necessary libraries for sending emails
 import smtplib
@@ -75,17 +74,10 @@ def authenticate_user(username, password):
 
 # Determine Shift
 def determine_shift():
-    # Get the current time in UTC
-    utc_now = pytz.utc.localize(datetime.utcnow())
-
-    # Convert to Indian Standard Time (IST)
-    ist_timezone = pytz.timezone('Asia/Kolkata')
-    ist_now = utc_now.astimezone(ist_timezone)
-
+    now = datetime.now()
     day_start = datetime.strptime("08:30", "%H:%M").time()
     day_end = datetime.strptime("17:30", "%H:%M").time()
-
-    return "Day" if day_start <= ist_now.time() <= day_end else "Night"
+    return "Day" if day_start <= now.time() <= day_end else "Night"
 
 # Generate Ticket Number
 def generate_ticket_number():
@@ -96,7 +88,7 @@ def send_email_notification(ticket_data):
     # Email configuration
     sender_email = "nandinimangal6@gmail.com"  # Replace with your Gmail address
     sender_password = "hlwligcygjrvonfz"  # Replace with your Gmail password or an app password
-    receiver_email = "mangalnandini6@gmail.com"
+    receiver_email = "mangalnandini6@gmail.com"  # Replace with the recipient's email address
     app_url = "https://ticketing-system-ede2.onrender.com/production"
 
     subject = f"New Ticket Raised: {ticket_data['ticket_number']}"
