@@ -605,8 +605,10 @@ def sort_tickets(tickets):
     status_order = {"Open": 1, "In Progress": 2, "Closed": 3}
     return sorted(
         tickets,
-        key=lambda x: (status_order.get(x.get("status"), 4),
-                       -x.get("start_time").timestamp() if x.get("start_time") else float('inf')),
+        key=lambda x: (
+            status_order.get(x.get("status"), 4),
+            -x.get("start_time").timestamp() if x.get("start_time") else float('inf')
+        )
     )
 
 
@@ -621,14 +623,27 @@ def engineering_dashboard():
     # Sort by status (Open, In Progress, Closed) and then by start_time (most recent first)
     sorted_tickets = sort_tickets(all_tickets)
 
-    # Extract date and time into separate fields for display
+    # Extract date and time into separate fields for display, handling timezone-aware datetimes
+    ist = pytz.timezone('Asia/Kolkata')  # Ensure consistent timezone
     for ticket in sorted_tickets:
         if ticket.get("start_time"):
-            ticket["start_date"] = ticket["start_time"].strftime('%Y-%m-%d')
-            ticket["start_time_only"] = ticket["start_time"].strftime('%H:%M:%S')
+            # Localize to IST if not already timezone-aware
+            start_time = ticket["start_time"]
+            if not start_time.tzinfo:  # If naive, assume it’s IST and localize
+                start_time = ist.localize(start_time)
+            ticket["start_date"] = start_time.strftime('%Y-%m-%d')
+            ticket["start_time_only"] = start_time.strftime('%H:%M:%S')
         else:
             ticket["start_date"] = None
             ticket["start_time_only"] = None
+
+        if ticket.get("close_time"):
+            close_time = ticket["close_time"]
+            if not close_time.tzinfo:  # If naive, assume it’s IST and localize
+                close_time = ist.localize(close_time)
+            ticket["close_time"] = close_time  # Keep the full datetime for elapsed time calculation
+        else:
+            ticket["close_time"] = None
 
     return render_template('engineering_dashboard.html', tickets=sorted_tickets)
 
