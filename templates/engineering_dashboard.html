@@ -154,8 +154,8 @@
                 <tr>
                     <td>{{ ticket.get('ticket_number') }}</td>
                     <td>{{ ticket.get('raised_by') }}</td>
-                    <td>{{ ticket.get('start_date') }}</td>
-                    <td>{{ ticket.get('start_time_only') }}</td>
+                    <td>{{ ticket.get('start_date') or 'N/A' }}</td>
+                    <td>{{ ticket.get('start_time_only') or 'N/A' }}</td>
                     <td>
                         {% if ticket.get('status') == 'Open' %}
                             <span class="status-open">Open</span>
@@ -164,7 +164,7 @@
                         {% elif ticket.get('status') == 'Closed' %}
                             <span class="status-closed">Closed</span>
                         {% else %}
-                            {{ ticket.get('status') }}
+                            {{ ticket.get('status') or 'Unknown' }}
                         {% endif %}
                     </td>
                     <td>
