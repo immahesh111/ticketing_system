@@ -7,6 +7,7 @@ import logging
 from pymongo import MongoClient
 from bson import ObjectId
 import certifi
+import pytz  # Add this import
 
 # Import necessary libraries for sending emails
 import smtplib
@@ -151,9 +152,13 @@ def production_form():
     if 'user_id' not in session:
         return redirect(url_for('production_login'))
 
-    current_date = datetime.now().strftime('%Y-%m-%d')
+    # Set timezone to IST
+    ist = pytz.timezone('Asia/Kolkata')
+    current_time_ist = datetime.now(ist)
+    
+    current_date = current_time_ist.strftime('%Y-%m-%d')
     current_shift = determine_shift()
-    event_start_time = datetime.now().strftime('%H:%M')
+    event_start_time = current_time_ist.strftime('%H:%M')  # Use IST time
 
     # Lists for the select elements
     lines = ["L01", "L02", "L03", "L04", "L05"]
@@ -519,7 +524,7 @@ def production_form():
         project = request.form['project']
         station = request.form['station']
         qpl = request.form['qpl']
-        issue_description = request.form['issue_description']  # ADDED
+        issue_description = request.form['issue_description']
 
         # Handle "Other" selections
         if selected_name == 'other':
@@ -533,18 +538,18 @@ def production_form():
         if qpl == 'other':
             qpl = request.form['other_qpl']
         if issue_description == 'other':
-            issue_description = request.form['other_issue_description']  # ADDED
+            issue_description = request.form['other_issue_description']
 
         new_ticket = {
             "ticket_number": generate_ticket_number(),
             "raised_by": selected_name,
-            "start_time": datetime.now(),
+            "start_time": current_time_ist,  # Store IST time in the database
             "line": line,
             "project": project,
             "station": station,
             "qpl": qpl,
             "section": section,
-            "issue_description": issue_description,  # ADDED
+            "issue_description": issue_description,
             "status": "Open",
             "close_time": None,
             "root_cause": None,
@@ -567,7 +572,7 @@ def production_form():
                            qpls=qpls,
                            raised_by_options=raised_by_options,
                            section=section,
-                           issue_descriptions=issue_descriptions)  # Pass the dictionary to the template
+                           issue_descriptions=issue_descriptions)
 
 @app.route('/ticket_submitted/<ticket_id>')
 @login_required
