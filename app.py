@@ -89,7 +89,7 @@ def send_email_notification(ticket_data):
     sender_email = "nandinimangal6@gmail.com"  # Replace with your Gmail address
     sender_password = "hlwligcygjrvonfz"  # Replace with your Gmail password or an app password
     receiver_email = "mangalnandini6@gmail.com"  # Replace with the recipient's email address
-    app_url = "https://ticketing-system-ede2.onrender.com"
+    app_url = "https://ticketing-system-ede2.onrender.com/production"
 
     subject = f"New Ticket Raised: {ticket_data['ticket_number']}"
     body = f"""
@@ -101,9 +101,8 @@ def send_email_notification(ticket_data):
     Project: {ticket_data['project']}
     Station: {ticket_data['station']}
     QPL: {ticket_data['qpl']}
-    Section: {ticket_data['section']}
     Issue Description: {ticket_data['issue_description']}
-     To view the ticket, click here: {app_url}
+    To view the ticket, click here: {app_url}
     """
 
     # Create MIMEText object
@@ -158,16 +157,359 @@ def production_form():
 
     # Lists for the select elements
     lines = ["L01", "L02", "L03", "L04", "L05"]
-    projects = ["C3F", "C3G", "C3YP", "C3Y2", "C3F2P"]
-    stations = ["Camera"]
+    projects = ["C3F", "C3FP", "C3ZP", "C3Y2", "C3F2P"]
+    stations = {
+        "ME": [
+            "ASM" ,
+            "BTB",
+            "CCD",
+            "GLUE", 
+            "LENS",
+            "LOGO CHECK 1",
+            "LOGO CHECK 2",
+            "LOGO-1",
+            "LOGO-2",
+            "PAMT",
+            "PAMT-1",
+            "PAMT-2",
+            "PDL",
+            "PLASMA",
+            "QCPAVF2",
+            "SCAN CODE",
+            "TOUCH",
+            "YH1",
+            "YH2",
+            "THERMAL GEL"],
+        "TE": [
+            "ANT",
+            "Audio",
+            "CAMERA",
+            "CQR",
+            "FAMMI",
+            "FCT",
+            "GPS",
+            "IDLE",
+            "KEYWRITE",
+            "KEYPARTS1",
+            "KEYWRITE",
+            "LST",
+            "MMI",
+            "PDL",
+            "RAUD",
+            "THERMAL GEL"
+            ]
+        }
     qpls = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    raised_by_options = ["P1", "P2", "P3", "P4", "P5"]
+    raised_by_options = {"Day Shift": [
+                         "Vipin",
+                         "Ankur Sharma",
+                         "Deepak",
+                         "Debashish",
+                         "Arun",
+                         "Roshan"],
+                        "Night Shift": [
+                        "Shivam",
+                        "Pankaj",
+                        "Ankur",
+                        "Tubul",
+                        "Ravi",
+                        "Vakeel"]}
     section = "Assembly"
     # Issue Descriptions - Organized by Section
     issue_descriptions = {
-         "CAMERA": [
+        "ANT": [
+            "ANT Tester Issue",
+            "ANT Port not working",
+            "Band Failures",
+            "Cycle time High",
+            "Tester not working"
+        ],
+        "ASM": [
+            "Port not working",
+            "Screw Missing",
+            "Affain Failed",
+            "Machine not working",
+            "Clamping Horn Error",
+            "Device transfer alarm",
+            "Machine NG Rate High",
+            "Screw Loose",
+            "Screw Feeder down",
+            "Screw Miss",
+            "Torque value not achieved"
+        ],
+        "Audio": [
+            "Post not working",
+            "Machine down",
+            "High Failures"
+        ],
+        "BTB": [
+            "Machine not working",
+            "Scanning Issue",
+            "High Rejection",
+            "Device Struck in Conveyor",
+            "Machine Power off",
+            "Machine reset alarm",
+            "Post not working",
+            "Stitch control issue (Light Box control fail) New issue"
+        ],
+        "CAMERA": [
             "Machine not working",
             "Fixture not coming to position"
+        ],
+        "CCD": [
+            "Alignment Fixture",
+            "Back cover shifting issue",
+            "CCD machine not working",
+            "Jacking cylinder vacuum abnormal alarm",
+            "Machine Power off",
+            "Machine Y-axis abnormal alarm",
+            "Object Template fail",
+            "Search area failed",
+            "Target Template failed",
+            "Template are not stable",
+            "Y-axis drive alarm"
+        ],
+        "CQR": [
+            "Group A, B and C not reset to home position suddenly NG",
+            "\"CQR client tool not open in one port ( AT the same time one backup port also running fine)\"",
+            "CQR Machine not working",
+            "Mobile not discharge properly",
+            "Scanner Issue",
+            "Tester not reset",
+            "Tool is not responding",
+            "Tool not open"
+        ],
+        "FAMMI": [
+            "Auto Update",
+            "Post not working"
+        ],
+        "FCT": [
+            "Communication Issue",
+            "Post not working",
+            "GRADIENT FAIL"
+        ],
+        "GRADIENT FAIL": [
+            "Gredinte failure issue",
+            "Lux Fail",
+            "PC power on issue",
+            "Port communication issue",
+            "Tool was not working",
+            "USB cable not connecting"
+        ],
+        "GLUE": [
+            "Tool Corrupt",
+            "AGVI not working properly",
+            "Camera platform drive alarm",
+            "Device Struck issue",
+            "Device Damage",
+            "Glue abnormal flow from the nozzle",
+            "Glue Detection issue",
+            "Glue improper flow",
+            "Machine not working",
+            "Glue not purging",
+            "Glue path NG",
+            "Glue path offset",
+            "Glue pattern offset",
+            "Glue weight NG",
+            "Nozzle jam",
+            "Pattern got NG",
+            "Plasma machine Issue",
+            "Sensor not working",
+            "VI section not working"
+        ],
+        "GPS": [
+            "GPS FAIL"
+        ],
+        "IDLE": [
+            "Robotic not reset",
+            "Device return to NG Conveyor",
+            "Camera not working",
+            "High Failures",
+            "Device not move in Pass conveyor",
+            "Machine not working",
+            "Port not working",
+            "Machine not Reset",
+            "Machine reset alarm due to Sensor feedback abnormal",
+            "PC Boot Issue",
+            "PC Hang",
+            "Power Supply issue",
+            "ROBOT IS NOT GOING TO PICK UP THE DEVICE",
+            "Robot not going to the axis position",
+            "Robot pickup sensor not detected",
+            "Robotic not reset",
+            "Testing not start",
+            "Tool is not responding",
+            "Post issue"
+        ],
+        "KEYPARTS1": [
+            "Device stuck between conveyor",
+            "High Failures",
+            "Machine not running properly"
+        ],
+        "KEYWRITE": [
+            "Check OS ready fail",
+            "Device dent issue",
+            "Device Picking Robot issue",
+            "EDI Client tool hang",
+            "Machine not working",
+            "Machine reset alarm",
+            "PLC hang",
+            "PLC not connect",
+            "PORT Hanging",
+            "Tool is not responding",
+            "USB not connecting",
+            "Virtual PC Issue"
+        ],
+        "LENS": [
+            "All lens coming from the NG Conveyor",
+            "ARM issue",
+            "Device struck up",
+            "Left tray loading failed",
+            "Lens feeder was not working",
+            "Lens not assembled",
+            "Lens pick up abnormal Alarm",
+            "\"Lens pull cylinder was not working \"",
+            "Lens tray pulling issue",
+            "Lens not fixing properly",
+            "Hardware issue",
+            "Machine Reset issue",
+            "Machine reset abnormal alarm",
+            "Feeder Issue",
+            "Servo Alarm",
+            "Suction Alarm",
+            "Template Issue",
+            "Tool is not responding",
+            "Tray Cylinder Issue",
+            "Vision tool not responding"
+        ],
+        "LOGO CHECK 1": [
+            "High Failures",
+            "Motot Shaft issue",
+            "Tool close issue"
+        ],
+        "LOGO CHECK 2": [
+            "Gift box failure rate is high",
+            "Machine PC power off issue",
+            "Program Corrupted",
+            "Quality Machine Validation fail",
+            "High Failures",
+            "Z axis head got open logo check 2"
+        ],
+        "LOGO-1": [
+            "Read Sensor issue",
+            "Software Issue"
+        ],
+        "LOGO-2": [
+            "Barcode Error",
+            "Device Fail",
+            "Detection Fail",
+            "Machine not working",
+            "Cyclinder issue",
+            "Software Issue",
+            "Weight not showing",
+            "Tool is not responding"
+        ],
+        "LST": [
+            "GRADIENT FAIL",
+            "Tester failure rate is high",
+            "Tool not open"
+        ],
+        "MMI": [
+            "PC not ON"
+        ],
+        "PAMT": [
+            "Fixed scanning fail",
+            "Tool is not responding"
+        ],
+        "PAMT-1": [
+            "Machine not working properly",
+            "Machine conveyor not working",
+            "MES & PLC Communication alarm in the tool",
+            "High Failures"
+        ],
+        "PAMT-2": [
+            "Machine Hang",
+            "Machine not working",
+            "Sampling issue",
+            "Tool is not responding"
+        ],
+        "PDL": [
+            "PC Hang",
+            "PORT Hang",
+            "ALL device return to NG Conveyor",
+            "OS Ready fail",
+            "IMEI not scan",
+            "Pick up issue",
+            "Scanning Issue",
+            "Device Struck",
+            "Failure rate is too high",
+            "Loading ARM Issue",
+            "Loading Cylinder Issue",
+            "M/C not working properly",
+            "Machine not Reset",
+            "Manipulator pickup problem",
+            "Maximum device not scanning",
+            "PC hang",
+            "PDL machine is not working",
+            "QR code not generated",
+            "Scanner Issue",
+            "The device was not holding properly",
+            "Port Issue",
+            "Tool is not responding",
+            "USB cable not connecting"
+        ],
+        "PLASMA": [
+            "Machine Alarm Issue",
+            "Plasma flame not coming (Cleaning exception Alarm)",
+            "Plasma not coming",
+            "Sensor not working"
+        ],
+        "QCPAVF2": [
+            "Belt was not rotating",
+            "Conveyor not rotating",
+            "Gift box barcode getting fail continuously"
+        ],
+        "RAUD": [
+            "Tester is not working",
+            "High Failures",
+            "Tester Caliberation issue",
+            "Tester not working"
+        ],
+        "SCAN CODE": [
+            "Device stuck between conveyor",
+            "Machine Transfer conveyor not working"
+        ],
+        "THERMAL GEL": [
+            "Glue path NG",
+            "Glue weight NG from SOP spec"
+        ],
+        "TOUCH": [
+            "LHS port not working",
+            "Machine not working properly"
+        ],
+        "YH1": [
+            "Control switch fail alarm",
+            "High Failures",
+            "Fixed scanning fail alarm",
+            "NG conveyor Belt not moving",
+            "Pressing value is out of specs",
+            "Switch control fail",
+            "Y1 -axis not moving"
+        ],
+        "YH2": [
+            "Machine Reset",
+            "Tool Corrupt",
+            "High Failures",
+            "Machine not working",
+            "Belt not Rotating",
+            "Device coming in NG Conveyor",
+            "Eragon Tool is continuously disconnecting while running time",
+            "Eragon Tool is not responding properly",
+            "Front robot arm is not working",
+            "Machine reset alarm",
+            "Machine tool not communicating with MES tool",
+            "MES Tool shutdown issue",
+            "Switch control fail"
         ]
     }
 
@@ -299,7 +641,39 @@ def view_ticket(ticket_id):
     is_closed = ticket.get('status') == 'Closed'
 
     # Engineer Options
-    engineer_options = ["e1", "e2", "e3", "e4"]
+    engineer_options = {"Day Shift": [
+                        "Vipin",
+                        "Harish",
+                        "Rajnish",
+                        "Ankur Sharma",
+                        "Zaheer",
+                        "Alam",
+                        "Dharmendra",
+                        "Debashish",
+                        "Anil",
+                        "Aditya Shukla",
+                        "suraj",
+                        "Vijay",
+                        "Roshan",
+                        "Bikash",
+                        "Prashant"],
+                        "Night Shift": [
+                        "Shivam",
+                        "Anupam",
+                        "Sachin",
+                        "Kehari",
+                        "Hitesh",
+                        "Arun"
+                        "Sushant",
+                        "Ankit",
+                        "Ravi",
+                        "Sabaj",
+                        "Rajesh",
+                        "Vibhishan",
+                        "Vakeel",
+                        "Bhagabat",
+                        "Aditya"]
+                        }
     if request.method == 'POST' and not is_closed:
         update_data = {
             "attended_by": request.form['attended_by'],

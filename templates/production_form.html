@@ -79,48 +79,78 @@
         <div class="ticket-form">
             <h1>Production Ticket Form</h1>
             <form method="POST">
-                <div class="form-group">
-                    <label for="selected_name">Raised By:</label>
-                    <select class="form-control select2" id="selected_name" name="selected_name" required>
-                        <option value="">Select Option</option>
-                        {% for option in raised_by_options %}
-                            <option value="{{ option }}">{{ option }}</option>
-                        {% endfor %}
-                        <option value="other">Other (Specify)</option>
-                    </select>
-                    <input type="text" class="form-control other-input" id="other_selected_name" name="other_selected_name" placeholder="Enter Name">
-                </div>
+               <div class="form-group">
+    <label for="selected_name">Raised By:</label>
+    <select class="form-control select2" id="selected_name" name="selected_name" required>
+        <option value="">Select Option</option>
+        {% for section, names in raised_by_options.items() %}
+            <optgroup label="{{ section }}">
+                {% for name in names %}
+                    <option value="{{ name }}">{{ name }}</option>
+                {% endfor %}
+            </optgroup>
+        {% endfor %}
+        <option value="other">Other (Specify)</option>
+    </select>
+    <input type="text" class="form-control other-input" id="other_selected_name" name="other_selected_name" placeholder="Enter Name" required>
+</div>
+
 
                 <div class="form-group">
                     <label for="date">Date:</label>
-                    <input type="text" class="form-control" id="date" name="date" value="{{ date }}" readonly>
+                    <input type="text" class="form-control" id="date" name="date" value="{{ date }}" readonly required>
                 </div>
 
                 <div class="form-group">
                     <label for="shift">Shift:</label>
-                    <input type="text" class="form-control" id="shift" name="shift" value="{{ shift }}" readonly>
+                    <input type="text" class="form-control" id="shift" name="shift" value="{{ shift }}" readonly required>
                 </div>
 
                 <div class="form-group">
                     <label for="event_start_time">Event Start Time:</label>
-                    <input type="text" class="form-control" id="event_start_time" name="event_start_time" value="{{ event_start_time }}" readonly>
+                    <input type="text" class="form-control" id="event_start_time" name="event_start_time" value="{{ event_start_time }}" readonly required>
                 </div>
 
                 <div class="form-group">
                     <label for="line">Line:</label>
-                    <input type="text" class="form-control" id="line" name="line" value="L01" readonly>
+                    <select class="form-control select2" id="line" name="line" required>
+                        <option value="">Select Line</option>
+                        {% for line_option in lines %}
+                            <option value="{{ line_option }}">{{ line_option }}</option>
+                        {% endfor %}
+                        <option value="other">Other (Specify)</option>
+                    </select>
+                    <input type="text" class="form-control other-input" id="other_line" name="other_line" placeholder="Enter Line">
                 </div>
 
                 <div class="form-group">
                     <label for="project">Project:</label>
-                    <input type="text" class="form-control" id="project" name="project" value="C3F" readonly>
+                    <select class="form-control select2" id="project" name="project" required>
+                        <option value="">Select Project</option>
+                        {% for project_option in projects %}
+                            <option value="{{ project_option }}">{{ project_option }}</option>
+                        {% endfor %}
+                        <option value="other">Other (Specify)</option>
+                    </select>
+                    <input type="text" class="form-control other-input" id="other_project" name="other_project" placeholder="Enter Project">
                 </div>
 
-                <div class="form-group">
-                    <label for="station">Section:</label>
-                    <input type="text" class="form-control" id="station" name="station" value="camera" readonly>
+              <div class="form-group">
+                    <label for="station">Station:</label>
+                    <select class="form-control select2" id="station" name="station" required>
+                        <option value="">Select Station</option>
+                        {% for section, station_options in stations.items() %}  <!-- Iterate through stations dictionary -->
+                            <optgroup label="{{ section }}">
+                                {% for station_option in station_options %}  <!-- Iterate through stations within the section -->
+                                    <option value="{{ station_option }}">{{ station_option }}</option>
+                                {% endfor %}
+                            </optgroup>
+                        {% endfor %}
+                        <option value="other">Other (Specify)</option>
+                    </select>
+                    <input type="text" class="form-control other-input" id="other_station" name="other_station" placeholder="Enter Station">
                 </div>
-
+                
                  <div class="form-group">
                     <label for="qpl">QPL:</label>
                     <select class="form-control select2" id="qpl" name="qpl" required>
@@ -182,9 +212,9 @@
 
             // Initialize toggling for each "Other" input
             toggleOtherInput($('#selected_name'), $('#other_selected_name'));
-            //toggleOtherInput($('#line'), $('#other_line'));
-            //toggleOtherInput($('#project'), $('#other_project'));
-           // toggleOtherInput($('#station'), $('#other_station'));
+            toggleOtherInput($('#line'), $('#other_line'));
+            toggleOtherInput($('#project'), $('#other_project'));
+            toggleOtherInput($('#station'), $('#other_station'));
             toggleOtherInput($('#qpl'), $('#other_qpl'));
 
 
