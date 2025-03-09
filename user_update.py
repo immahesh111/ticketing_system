@@ -8,7 +8,6 @@ client = MongoClient("mongodb+srv://aarushibawejaji:heya@cluster0.imgm1l7.mongod
 db = client["ticketing_system"]  # Updated to match app.py
 tickets_collection = db["tickets"]  # Collection for tickets
 users_collection = db["users"]  # Collection for users
-ist = pytz.timezone('Asia/Kolkata')
 
 # Initialize Bcrypt for password hashing
 bcrypt = Bcrypt()
