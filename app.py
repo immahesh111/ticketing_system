@@ -75,7 +75,8 @@ def authenticate_user(username, password):
 
 # Determine Shift
 def determine_shift():
-    now = datetime.now()
+    ist = pytz.timezone('Asia/Kolkata')
+    now = datetime.now(ist)  # Get current time in IST
     day_start = datetime.strptime("08:30", "%H:%M").time()
     day_end = datetime.strptime("17:30", "%H:%M").time()
     return "Day" if day_start <= now.time() <= day_end else "Night"
@@ -157,8 +158,8 @@ def production_form():
     current_time_ist = datetime.now(ist)
     
     current_date = current_time_ist.strftime('%Y-%m-%d')
-    current_shift = determine_shift()
-    event_start_time = current_time_ist.strftime('%H:%M')  # Use IST time
+    current_shift = determine_shift()  # This now uses IST
+    event_start_time = current_time_ist.strftime('%H:%M')
 
     # Lists for the select elements
     lines = ["L01", "L02", "L03", "L04", "L05"]
