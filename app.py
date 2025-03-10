@@ -93,7 +93,7 @@ def send_email_notification(ticket_data):
     sender_email = "nandinimangal6@gmail.com"
     sender_password = "hlwligcygjrvonfz"
     receiver_email = "mangalnandini6@gmail.com"
-    app_url = "https://ticketing-system-ede2.onrender.com/production"
+    app_url = "https://ticketing-system-ede2.onrender.com/engineering_dashboard"
 
     subject = f"New Ticket Raised: {ticket_data['ticket_number']}"
     body = f"""
