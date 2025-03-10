@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from datetime import datetime, timezone  # Updated import for timezone-aware UTC
+from datetime import datetime
 import secrets
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
 from flask_bcrypt import Bcrypt
@@ -75,7 +75,10 @@ def authenticate_user(username, password):
 
 # Determine Shift
 def determine_shift():
-    utc_now = datetime.now(timezone.utc)  # Updated to timezone-aware UTC
+    # Get the current time in UTC
+    utc_now = pytz.utc.localize(datetime.utcnow())
+
+    # Convert to Indian Standard Time (IST)
     ist_timezone = pytz.timezone('Asia/Kolkata')
     ist_now = utc_now.astimezone(ist_timezone)
 
@@ -90,8 +93,9 @@ def generate_ticket_number():
 
 # Function to send email
 def send_email_notification(ticket_data):
-    sender_email = "nandinimangal6@gmail.com"
-    sender_password = "hlwligcygjrvonfz"
+    # Email configuration
+    sender_email = "nandinimangal6@gmail.com"  # Replace with your Gmail address
+    sender_password = "hlwligcygjrvonfz"  # Replace with your Gmail password or an app password
     receiver_email = "mangalnandini6@gmail.com"
     app_url = "https://ticketing-system-ede2.onrender.com/production"
 
@@ -109,11 +113,13 @@ def send_email_notification(ticket_data):
     To view the ticket, click here: {app_url}
     """
 
+    # Create MIMEText object
     msg = MIMEText(body)
     msg['Subject'] = subject
     msg['From'] = sender_email
     msg['To'] = receiver_email
 
+    # Connect to Gmail's SMTP server
     try:
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
             smtp.login(sender_email, sender_password)
@@ -131,14 +137,31 @@ def setup_data():
     return "Setup data function not implemented yet."
 
 @app.route('/production', methods=['GET', 'POST'])
-def production():
-    print("Accessed /production route")
-    return redirect(url_for('production_form'))
+def production_login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        user = authenticate_user(username, password)
+
+        if user and user.role == 'production':
+            login_user(user)
+            session['user_id'] = user.id
+            return redirect(url_for('production_form'))
+        else:
+            flash('Invalid username or password')
+            return render_template('production_login.html', error='Invalid credentials')
+
+    return render_template('production_login.html')
 
 @app.route('/production_form', methods=['GET', 'POST'])
+@login_required
 def production_form():
-    print("Accessed /production_form route")
-    utc_now = datetime.now(timezone.utc)  # Updated to timezone-aware UTC
+    if 'user_id' not in session:
+        return redirect(url_for('production_login'))
+
+    # Get current time in UTC
+    utc_now = pytz.utc.localize(datetime.utcnow())
+    # Convert to Indian Standard Time (IST) for display
     ist_timezone = pytz.timezone('Asia/Kolkata')
     ist_now = utc_now.astimezone(ist_timezone)
 
@@ -146,21 +169,67 @@ def production_form():
     current_shift = determine_shift()
     event_start_time = ist_now.strftime('%H:%M')
 
+    # Lists for the select elements
     lines = ["L01", "L02", "L03", "L04", "L05"]
     projects = ["C3F", "C3FP", "C3ZP", "C3Y2", "C3F2P"]
     stations = {
-        "ME": ["ASM", "BTB", "CCD", "GLUE", "LENS", "LOGO CHECK 1", "LOGO CHECK 2",
-               "LOGO-1", "LOGO-2", "PAMT", "PAMT-1", "PAMT-2", "PDL", "PLASMA",
-               "QCPAVF2", "SCAN CODE", "TOUCH", "YH1", "YH2", "THERMAL GEL"],
-        "TE": ["ANT", "Audio", "CAMERA", "CQR", "FAMMI", "FCT", "GPS", "IDLE",
-               "KEYWRITE", "KEYPARTS1", "LST", "MMI", "PDL", "RAUD", "THERMAL GEL"]
-    }
+        "ME": [
+            "ASM" ,
+            "BTB",
+            "CCD",
+            "GLUE", 
+            "LENS",
+            "LOGO CHECK 1",
+            "LOGO CHECK 2",
+            "LOGO-1",
+            "LOGO-2",
+            "PAMT",
+            "PAMT-1",
+            "PAMT-2",
+            "PDL",
+            "PLASMA",
+            "QCPAVF2",
+            "SCAN CODE",
+            "TOUCH",
+            "YH1",
+            "YH2",
+            "THERMAL GEL"],
+        "TE": [
+            "ANT",
+            "Audio",
+            "CAMERA",
+            "CQR",
+            "FAMMI",
+            "FCT",
+            "GPS",
+            "IDLE",
+            "KEYWRITE",
+            "KEYPARTS1",
+            "KEYWRITE",
+            "LST",
+            "MMI",
+            "PDL",
+            "RAUD",
+            "THERMAL GEL"
+            ]
+        }
     qpls = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    raised_by_options = {
-        "Day Shift": ["Vipin", "Ankur Sharma", "Deepak", "Debashish", "Arun", "Roshan"],
-        "Night Shift": ["Shivam", "Pankaj", "Ankur", "Tubul", "Ravi", "Vakeel"]
-    }
+    raised_by_options = {"Day Shift": [
+                         "Vipin",
+                         "Ankur Sharma",
+                         "Deepak",
+                         "Debashish",
+                         "Arun",
+                         "Roshan"],
+                        "Night Shift": [
+                        "Shivam",
+                        "Pankaj",
+                        "Ankur",
+                        "Tubul",
+                        "Ravi",
+                        "Vakeel"]}
     section = "Assembly"
+    # Issue Descriptions - Organized by Section
     issue_descriptions = {
         "ANT": [
             "ANT Tester Issue",
@@ -459,7 +528,6 @@ def production_form():
     }
 
     if request.method == 'POST':
-        print("Processing POST request in production_form")
         selected_name = request.form['selected_name']
         line = request.form['line']
         project = request.form['project']
@@ -467,6 +535,7 @@ def production_form():
         qpl = request.form['qpl']
         issue_description = request.form['issue_description']
 
+        # Handle "Other" selections
         if selected_name == 'other':
             selected_name = request.form['other_selected_name']
         if line == 'other':
@@ -483,7 +552,7 @@ def production_form():
         new_ticket = {
             "ticket_number": generate_ticket_number(),
             "raised_by": selected_name,
-            "start_time": datetime.now(timezone.utc),  # Updated to timezone-aware UTC
+            "start_time": datetime.utcnow(),  # Changed to UTC
             "line": line,
             "project": project,
             "station": station,
@@ -496,11 +565,10 @@ def production_form():
             "corrective_action": None
         }
         ticket_id = tickets_collection.insert_one(new_ticket).inserted_id
-        print(f"Ticket inserted with ID: {ticket_id}")
+
         send_email_notification(new_ticket)
         return redirect(url_for('ticket_submitted', ticket_id=ticket_id))
 
-    print("Rendering production_form.html")
     return render_template('production_form.html',
                            date=current_date,
                            shift=current_shift,
@@ -514,7 +582,12 @@ def production_form():
                            issue_descriptions=issue_descriptions)
 
 @app.route('/ticket_submitted/<ticket_id>')
+@login_required
 def ticket_submitted(ticket_id):
+    # Clear the user_id from the session
+    session.pop('user_id', None)
+    # Or, if you want to log the user out completely:
+    logout_user()
     return render_template('ticket_submitted.html', ticket_id=ticket_id)
 
 @app.route('/engineering', methods=['GET', 'POST'])
@@ -541,6 +614,7 @@ def sort_tickets(tickets):
         key=lambda x: (status_order.get(x.get("status"), 4),
                        -x.get("start_time").timestamp() if x.get("start_time") else float('inf')),
     )
+
 
 @app.route('/engineering_dashboard')
 @login_required
@@ -584,6 +658,7 @@ def view_ticket(ticket_id):
 
     ist_timezone = pytz.timezone('Asia/Kolkata')
 
+    # Convert start_time to IST
     if ticket.get("start_time"):
         utc_start_time = ticket["start_time"].replace(tzinfo=pytz.utc)
         ist_start_time = utc_start_time.astimezone(ist_timezone)
@@ -591,6 +666,7 @@ def view_ticket(ticket_id):
     else:
         ticket["start_time_str"] = None
 
+    # Convert close_time to IST
     if ticket.get("close_time"):
         utc_close_time = ticket["close_time"].replace(tzinfo=pytz.utc)
         ist_close_time = utc_close_time.astimezone(ist_timezone)
@@ -623,13 +699,14 @@ def view_ticket(ticket_id):
             "spares_required": request.form['spares_required'],
         }
         if request.form['status'] == 'Closed':
-            update_data['close_time'] = datetime.now(timezone.utc)  # Updated to timezone-aware UTC
+            update_data['close_time'] = datetime.utcnow()  # Store in UTC
         else:
             update_data['close_time'] = None
 
         tickets_collection.update_one({"_id": ObjectId(ticket_id)}, {"$set": update_data})
 
         ticket = tickets_collection.find_one({"_id": ObjectId(ticket_id)})
+        # Reconvert times after update
         if ticket.get("start_time"):
             utc_start_time = ticket["start_time"].replace(tzinfo=pytz.utc)
             ist_start_time = utc_start_time.astimezone(ist_timezone)
@@ -653,11 +730,12 @@ def login():
 
         if user:
             login_user(user)
-            session['user_id'] = user.id
+            session['user_id'] = user.id  # Store user_id in session
+            # Redirect based on role
             if user.role == 'engineering':
                 return redirect(url_for('engineering_dashboard'))
             else:
-                return redirect(url_for('production_form'))
+                return redirect(url_for('production_form'))  # Or wherever production goes
         else:
             flash('Invalid username or password')
             return render_template('login.html', error='Invalid credentials')
@@ -689,4 +767,4 @@ def logout():
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000)  # Added debug=True for better error reporting
+    app.run(host="0.0.0.0", port=5000)
