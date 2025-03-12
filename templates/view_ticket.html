@@ -21,6 +21,15 @@
             padding: 30px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative; /* Allow absolute positioning of the logo within */
+        }
+
+        .logo {
+            max-width: 150px;
+            display: block;
+            position: absolute;
+            top: 20px; /* Distance from top */
+            left: 20px; /* Distance from left */
         }
 
         h1 {
@@ -162,11 +171,11 @@
             border-color: #3498db;
             outline: none;
         }
-
     </style>
 </head>
 <body>
     <div class="container">
+        <img src="{{ url_for('static', filename='images/padget_logo.png') }}" alt="Padget Logo" class="logo">
         <h1>Ticket Details</h1>
 
         <section class="production-details">
@@ -199,24 +208,17 @@
                 <label>QPL:</label>
                 <input type="text" value="{{ ticket['qpl'] }}" disabled class="read-only">
             </div>
+            <div class="detail-row">
+                <label>Issue Description:</label>
+                <textarea disabled class="read-only">{{ ticket['production_issue_description'] }}</textarea>
+            </div>
         </section>
 
         <form method="POST">
             <section class="engineering-details">
-                <h2>SME response</h2>
+                <h2>SME Response</h2>
 
                 <div class="detail-row">
-                    <label for="station">Station:</label>
-                    <select id="station" name="station" {% if is_closed %}disabled{% endif %}>
-                        <option value="">Select Station</option>
-                        <option value="CG-Glue Line" {% if ticket['station'] == 'CG-Glue Line' %}selected{% endif %}>CG-Glue Line</option>
-                        <option value="FA-Assembly" {% if ticket['station'] == 'FA-Assembly' %}selected{% endif %}>FA-Assembly</option>
-                        <option value="RMT-Testing" {% if ticket['station'] == 'RMT-Testing' %}selected{% endif %}>RMT-Testing</option>
-                        <option value="Packing" {% if ticket['station'] == 'Packing' %}selected{% endif %}>Packing</option>
-                    </select>
-                </div>
-
-              <div class="detail-row">
                     <label for="attended_by">Attended By:</label>
                     <select id="attended_by" name="attended_by" {% if is_closed %}disabled{% endif %}>
                         <option value="">Select Engineer</option>
@@ -240,8 +242,8 @@
                 </div>
 
                 <div class="detail-row">
-                    <label for="issue_description">Issue Description:</label>
-                    <textarea id="issue_description" name="issue_description" {% if is_closed %}disabled{% endif %}>{{ ticket['issue_description'] }}</textarea>
+                    <label for="sme_issue_description">Issue Description:</label>
+                    <textarea id="sme_issue_description" name="sme_issue_description" {% if is_closed %}disabled{% endif %}>{{ ticket['sme_issue_description'] }}</textarea>
                 </div>
 
                 <div class="detail-row">
@@ -275,10 +277,12 @@
             {% endif %}
         </form>
         <a href="{{ url_for('engineering_dashboard') }}">Back to Dashboard</a>
+        {% if ticket['status'] == 'Closed' %}
+            <a href="{{ url_for('export_ticket_excel', ticket_id=ticket['_id']) }}">Export to Excel</a>
+        {% endif %}
     </div>
 
     <script>
-
     </script>
 </body>
 </html>
