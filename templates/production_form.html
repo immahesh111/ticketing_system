@@ -24,6 +24,15 @@
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            position: relative; /* Allow absolute positioning of the logo within */
+        }
+
+        .logo {
+            max-width: 150px;
+            display: block;
+            position: absolute;
+            top: 20px; /* Distance from top */
+            left: 20px; /* Distance from left */
         }
 
         h1 {
@@ -77,24 +86,24 @@
 <body>
     <div class="container">
         <div class="ticket-form">
+            <img src="{{ url_for('static', filename='images/padget_logo.png') }}" alt="Padget Logo" class="logo">
             <h1>Production Ticket Form</h1>
             <form method="POST">
-               <div class="form-group">
-    <label for="selected_name">Raised By:</label>
-    <select class="form-control select2" id="selected_name" name="selected_name" required>
-        <option value="">Select Option</option>
-        {% for section, names in raised_by_options.items() %}
-            <optgroup label="{{ section }}">
-                {% for name in names %}
-                    <option value="{{ name }}">{{ name }}</option>
-                {% endfor %}
-            </optgroup>
-        {% endfor %}
-        <option value="other">Other (Specify)</option>
-    </select>
-    <input type="text" class="form-control other-input" id="other_selected_name" name="other_selected_name" placeholder="Enter Name" required>
-</div>
-
+                <div class="form-group">
+                    <label for="selected_name">Raised By:</label>
+                    <select class="form-control select2" id="selected_name" name="selected_name" required>
+                        <option value="">Select Option</option>
+                        {% for section, names in raised_by_options.items() %}
+                            <optgroup label="{{ section }}">
+                                {% for name in names %}
+                                    <option value="{{ name }}">{{ name }}</option>
+                                {% endfor %}
+                            </optgroup>
+                        {% endfor %}
+                        <option value="other">Other (Specify)</option>
+                    </select>
+                    <input type="text" class="form-control other-input" id="other_selected_name" name="other_selected_name" placeholder="Enter Name" required>
+                </div>
 
                 <div class="form-group">
                     <label for="date">Date:</label>
@@ -135,13 +144,13 @@
                     <input type="text" class="form-control other-input" id="other_project" name="other_project" placeholder="Enter Project">
                 </div>
 
-              <div class="form-group">
+                <div class="form-group">
                     <label for="station">Station:</label>
                     <select class="form-control select2" id="station" name="station" required>
                         <option value="">Select Station</option>
-                        {% for section, station_options in stations.items() %}  <!-- Iterate through stations dictionary -->
+                        {% for section, station_options in stations.items() %}
                             <optgroup label="{{ section }}">
-                                {% for station_option in station_options %}  <!-- Iterate through stations within the section -->
+                                {% for station_option in station_options %}
                                     <option value="{{ station_option }}">{{ station_option }}</option>
                                 {% endfor %}
                             </optgroup>
@@ -151,30 +160,23 @@
                     <input type="text" class="form-control other-input" id="other_station" name="other_station" placeholder="Enter Station">
                 </div>
                 
-                 <div class="form-group">
+                <div class="form-group">
                     <label for="qpl">QPL:</label>
                     <select class="form-control select2" id="qpl" name="qpl" required>
                         <option value="">Select QPL</option>
                         {% for qpl_option in qpls %}
                             <option value="{{ qpl_option }}">{{ qpl_option }}</option>
                         {% endfor %}
-                         <option value="other">Other (Specify)</option>
+                        <option value="other">Other (Specify)</option>
                     </select>
                     <input type="text" class="form-control other-input" id="other_qpl" name="other_qpl" placeholder="Enter QPL">
                 </div>
 
                 <div class="form-group">
                     <label for="issue_description">Issue Description:</label>
-                    <select class="form-control" id="issue_description" name="issue_description" required>
+                    <select class="form-control select2" id="issue_description" name="issue_description" required>
                         <option value="">Select Issue</option>
-                        {% for section, issues in issue_descriptions.items() %}
-                            <optgroup label="{{ section }}">
-                                {% for issue in issues %}
-                                    <option value="{{ issue }}">{{ issue }}</option>
-                                {% endfor %}
-                            </optgroup>
-                        {% endfor %}
-                        <option value="other">Other (Specify)</option>
+                        <!-- Options will be populated dynamically by JavaScript -->
                     </select>
                     <textarea class="form-control other-input" id="other_issue_description" name="other_issue_description" placeholder="Enter Issue Description" rows="3"></textarea>
                 </div>
@@ -217,11 +219,59 @@
             toggleOtherInput($('#station'), $('#other_station'));
             toggleOtherInput($('#qpl'), $('#other_qpl'));
 
-
-           //Issue Description
+            // Issue Description filtering based on Station
             const issueDescriptionSelect = $('#issue_description');
             const otherIssueDescriptionInput = $('#other_issue_description');
+            
+            // Store the issue descriptions for filtering
+            const issueDescriptions = {
+                {% for section, issues in issue_descriptions.items() %}
+                    "{{ section }}": [
+                        {% for issue in issues %}
+                            "{{ issue }}",
+                        {% endfor %}
+                    ],
+                {% endfor %}
+            };
 
+            // Function to update Issue Description dropdown based on selected Station
+            function updateIssueDescriptions() {
+                const selectedStation = $('#station').val();
+                const issueSelect = $('#issue_description');
+
+                // Clear existing options
+                issueSelect.empty();
+                issueSelect.append('<option value="">Select Issue</option>');
+
+                if (selectedStation && selectedStation !== 'other' && issueDescriptions[selectedStation]) {
+                    // Populate with issues related to the selected station
+                    issueDescriptions[selectedStation].forEach(function(issue) {
+                        issueSelect.append('<option value="' + issue + '">' + issue + '</option>');
+                    });
+                }
+                
+                // Always add the "Other" option at the end
+                issueSelect.append('<option value="other">Other (Specify)</option>');
+
+                // Trigger Select2 update
+                issueSelect.trigger('change.select2');
+            }
+
+            // Update issue descriptions when station changes
+            $('#station').on('change', function() {
+                updateIssueDescriptions();
+
+                // Toggle "Other" input for issue description
+                if (issueDescriptionSelect.val() === 'other') {
+                    otherIssueDescriptionInput.show();
+                    otherIssueDescriptionInput.prop('required', true);
+                } else {
+                    otherIssueDescriptionInput.hide();
+                    otherIssueDescriptionInput.prop('required', false);
+                }
+            });
+
+            // Toggle "Other" input for issue description
             issueDescriptionSelect.on('change', function() {
                 if (this.value === 'other') {
                     otherIssueDescriptionInput.show();
@@ -231,6 +281,9 @@
                     otherIssueDescriptionInput.prop('required', false);
                 }
             }).trigger('change');
+
+            // Initial update in case a station is pre-selected
+            updateIssueDescriptions();
         });
     </script>
 </body>
