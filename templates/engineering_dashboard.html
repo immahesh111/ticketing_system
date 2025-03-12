@@ -12,6 +12,7 @@
             background-color: #f4f4f4;
             color: #333;
         }
+
         .container {
             width: 95%;
             max-width: 1200px;
@@ -20,93 +21,101 @@
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            position: relative;
         }
-        .logo {
-            max-width: 150px;
-            display: block;
-            position: absolute;
-            top: 20px;
-            left: 20px;
-        }
+
         h1 {
             text-align: center;
             color: #2c3e50;
             margin-bottom: 20px;
         }
+
         /* Table Styles */
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
+
         th, td {
             padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
+
         th {
             background-color: #3498db;
             color: white;
             font-weight: bold;
         }
+
         tbody tr:hover {
             background-color: #f5f5f5;
         }
+
         /* Status Styles */
         .status-open {
-            background-color: #e74c3c;
+            background-color: #e74c3c; /* Red */
             color: white;
             padding: 5px 10px;
             border-radius: 5px;
             display: inline-block;
         }
+
         .status-in-progress {
-            background-color: #f39c12;
+            background-color: #f39c12; /* Yellow/Orange */
             color: white;
             padding: 5px 10px;
             border-radius: 5px;
             display: inline-block;
         }
+
         .status-closed {
-            background-color: #2ecc71;
+            background-color: #2ecc71; /* Green */
             color: white;
             padding: 5px 10px;
             border-radius: 5px;
             display: inline-block;
         }
+
         /* Link Styles */
         a {
             color: #3498db;
             text-decoration: none;
             transition: color 0.3s ease;
         }
+
         a:hover {
             text-decoration: underline;
             color: #2980b9;
         }
         /* Additional Styles for a more beautiful look */
         body {
-            background-color: #ecf0f1;
+            background-color: #ecf0f1; /* Light gray background */
         }
+
         .container {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Softer shadow */
         }
+
         h1 {
-            color: #34495e;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+            color: #34495e; /* Darker, more professional heading color */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* Subtle text shadow */
         }
+
         th {
-            background-color: #2980b9;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            background-color: #2980b9; /* Darker blue for header */
+            text-transform: uppercase; /* Uppercase header text */
+            letter-spacing: 1px; /* Add letter spacing */
         }
+
         td {
-            background-color: #ffffff;
+            background-color: #ffffff; /* White background for data cells */
         }
+
         tbody tr:nth-child(even) {
-            background-color: #f9f9f9;
+            background-color: #f9f9f9; /* Slightly different background for even rows */
         }
+
         a {
             display: inline-block;
             padding: 8px 12px;
@@ -115,37 +124,16 @@
             border-radius: 5px;
             transition: background-color 0.3s ease;
         }
+
         a:hover {
             background-color: #2980b9;
             text-decoration: none;
-        }
-        /* Form Button Styles */
-        button[type="submit"] {
-            background-color: #27ae60;
-            color: white;
-            padding: 8px 12px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        button[type="submit"]:hover {
-            background-color: #219653;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <img src="{{ url_for('static', filename='images/padget_logo.png') }}" alt="Padget Logo" class="logo">
         <h1>Equip Flow Ticket Monitoring</h1>
-        <!-- Export Form -->
-        <form action="{{ url_for('export_tickets_excel') }}" method="post" style="margin-bottom: 20px;">
-            <label for="start_date">Start Date:</label>
-            <input type="date" id="start_date" name="start_date" required>
-            <label for="end_date">End Date:</label>
-            <input type="date" id="end_date" name="end_date" required>
-            <button type="submit">Export to Excel</button>
-        </form>
         <table>
             <thead>
                 <tr>
@@ -159,7 +147,6 @@
                     <th>View</th>
                     <th>Root Cause</th>
                     <th>Corrective Action</th>
-                    <th>Export</th>
                 </tr>
             </thead>
             <tbody>
@@ -181,15 +168,16 @@
                         {% endif %}
                     </td>
                     <td>
-                        {% if ticket.get('close_time_str') %}
+                        {% if ticket.get('status') == 'Closed' and ticket.get('close_time_str') %}
                             {{ ticket.get('close_time_str') }}
                         {% else %}
                             -
                         {% endif %}
                     </td>
                     <td>
-                        {% if ticket.get('elapsed_time') is not none %}
-                            {{ ticket.get('elapsed_time') }}
+                        {% if ticket.get('status') == 'Closed' and ticket.get('start_time') and ticket.get('close_time') %}
+                            {% set elapsed_time = (ticket.get('close_time') - ticket.get('start_time')).total_seconds() / 60 %}
+                            {{ elapsed_time|round(2) }}
                         {% else %}
                             -
                         {% endif %}
@@ -197,13 +185,6 @@
                     <td><a href="{{ url_for('view_ticket', ticket_id=ticket['_id']) }}">View</a></td>
                     <td>{{ ticket.get('root_cause') or 'N/A' }}</td>
                     <td>{{ ticket.get('corrective_action') or 'N/A' }}</td>
-                    <td>
-                        {% if ticket.get('status') == 'Closed' %}
-                            <a href="{{ url_for('export_ticket_excel', ticket_id=ticket['_id']) }}">Download Excel</a>
-                        {% else %}
-                            -
-                        {% endif %}
-                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
