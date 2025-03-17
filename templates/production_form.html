@@ -24,12 +24,29 @@
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .header-section {
+            position: relative;
+            margin-bottom: 30px;
+            min-height: 80px;
+        }
+
+        .logo {
+            position: absolute;
+            left: 20px;
+            top: -20px;
+            max-width: 120px;
+            height: auto;
         }
 
         h1 {
             color: #343a40;
             text-align: center;
-            margin-bottom: 30px;
+            margin: 0;
+            line-height: 80px;
+            width: 100%;
         }
 
         label {
@@ -52,49 +69,54 @@
             border-color: #0062cc;
         }
 
-        /* Custom CSS for a cleaner look */
         .form-control:focus {
             border-color: #80bdff;
             box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
         }
 
-        .form-group select.form-control {
-            appearance: none; /* Remove default arrow */
-            background-image: url('data:image/svg+xml;charset=UTF-8,<svg viewBox="0 0 12 6" fill="%23343a40" xmlns="http://www.w3.org/2000/svg"><path d="M10.293 0.293L6 4.586L1.707 0.293C1.317 -0.098 0.683 -0.098 0.293 0.293C-0.098 0.683 -0.098 1.317 0.293 1.707L5.293 6.707C5.683 7.098 6.317 7.098 6.707 6.707L11.707 1.707C12.098 1.317 12.098 0.683 11.707 0.293C11.317 -0.098 10.683 -0.098 10.293 0.293Z"/></svg>');
-            background-repeat: no-repeat;
-            background-position: right 0.75rem center;
-            background-size: 12px;
-            padding-right: 2.25rem;
-        }
-
-        /* Style for hidden "Other" input */
         .other-input {
             display: none;
             margin-top: 5px;
+        }
+
+        .radio-group {
+            margin-top: 10px;
+        }
+
+        .radio-group .form-check {
+            margin-bottom: 10px;
+        }
+
+        .radio-group strong {
+            display: block;
+            margin-bottom: 5px;
+            color: #343a40;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="ticket-form">
-            <h1>Production Ticket Form</h1>
-            <form method="POST">
-               <div class="form-group">
-    <label for="selected_name">Raised By:</label>
-    <select class="form-control select2" id="selected_name" name="selected_name" required>
-        <option value="">Select Option</option>
-        {% for section, names in raised_by_options.items() %}
-            <optgroup label="{{ section }}">
-                {% for name in names %}
-                    <option value="{{ name }}">{{ name }}</option>
-                {% endfor %}
-            </optgroup>
-        {% endfor %}
-        <option value="other">Other (Specify)</option>
-    </select>
-    <input type="text" class="form-control other-input" id="other_selected_name" name="other_selected_name" placeholder="Enter Name" required>
-</div>
-
+            <div class="header-section">
+                <img src="{{ url_for('static', filename='images/padget_logo.png') }}" alt="Padget Logo" class="logo">
+                <h1>Production Ticket Form</h1>
+            </div>
+            <form method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="selected_name">Raised By:</label>
+                    <select class="form-control select2" id="selected_name" name="selected_name" required>
+                        <option value="">Select Option</option>
+                        {% for section, names in raised_by_options.items() %}
+                            <optgroup label="{{ section }}">
+                                {% for name in names %}
+                                    <option value="{{ name }}">{{ name }}</option>
+                                {% endfor %}
+                            </optgroup>
+                        {% endfor %}
+                        <option value="other">Other (Specify)</option>
+                    </select>
+                    <input type="text" class="form-control other-input" id="other_selected_name" name="other_selected_name" placeholder="Enter Name">
+                </div>
 
                 <div class="form-group">
                     <label for="date">Date:</label>
@@ -112,54 +134,79 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="line">Line:</label>
-                    <select class="form-control select2" id="line" name="line" required>
-                        <option value="">Select Line</option>
+                    <label>Line:</label>
+                    <div class="radio-group">
                         {% for line_option in lines %}
-                            <option value="{{ line_option }}">{{ line_option }}</option>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="line" id="line_{{ line_option }}" value="{{ line_option }}" required>
+                                <label class="form-check-label" for="line_{{ line_option }}">{{ line_option }}</label>
+                            </div>
                         {% endfor %}
-                        <option value="other">Other (Specify)</option>
-                    </select>
-                    <input type="text" class="form-control other-input" id="other_line" name="other_line" placeholder="Enter Line">
+                    </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="project">Project:</label>
-                    <select class="form-control select2" id="project" name="project" required>
-                        <option value="">Select Project</option>
+                    <label>Project:</label>
+                    <div class="radio-group">
                         {% for project_option in projects %}
-                            <option value="{{ project_option }}">{{ project_option }}</option>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="project" id="project_{{ project_option }}" value="{{ project_option }}" required>
+                                <label class="form-check-label" for="project_{{ project_option }}">{{ project_option }}</label>
+                            </div>
                         {% endfor %}
-                        <option value="other">Other (Specify)</option>
-                    </select>
-                    <input type="text" class="form-control other-input" id="other_project" name="other_project" placeholder="Enter Project">
+                    </div>
                 </div>
 
-              <div class="form-group">
-                    <label for="station">Station:</label>
-                    <select class="form-control select2" id="station" name="station" required>
-                        <option value="">Select Station</option>
-                        {% for section, station_options in stations.items() %}  <!-- Iterate through stations dictionary -->
-                            <optgroup label="{{ section }}">
-                                {% for station_option in station_options %}  <!-- Iterate through stations within the section -->
-                                    <option value="{{ station_option }}">{{ station_option }}</option>
+                <div class="form-group">
+                    <label>Station:</label>
+                    <div class="radio-group" id="station_group">
+                        {% for section, station_options in stations.items() %}
+                            <div>
+                                <strong>{{ section }}</strong>
+                                {% for station_option in station_options %}
+                                    <div class="form-check">
+                                        <input class="form-check-input station-radio" type="radio" name="station" id="station_{{ station_option }}" value="{{ station_option }}" required>
+                                        <label class="form-check-label" for="station_{{ station_option }}">{{ station_option }}</label>
+                                    </div>
                                 {% endfor %}
-                            </optgroup>
+                            </div>
                         {% endfor %}
-                        <option value="other">Other (Specify)</option>
-                    </select>
+                        <div class="form-check">
+                            <input class="form-check-input station-radio" type="radio" name="station" id="station_other" value="other">
+                            <label class="form-check-label" for="station_other">Other (Specify)</label>
+                        </div>
+                    </div>
                     <input type="text" class="form-control other-input" id="other_station" name="other_station" placeholder="Enter Station">
                 </div>
-                
-                 <div class="form-group">
-                    <label for="qpl">QPL:</label>
-                    <select class="form-control select2" id="qpl" name="qpl" required>
-                        <option value="">Select QPL</option>
-                        {% for qpl_option in qpls %}
-                            <option value="{{ qpl_option }}">{{ qpl_option }}</option>
-                        {% endfor %}
-                         <option value="other">Other (Specify)</option>
-                    </select>
+
+                <div class="form-group">
+                    <label>QPL:</label>
+                    <div class="radio-group">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="qpl" id="qpl_1" value="1" required>
+                            <label class="form-check-label" for="qpl_1">1</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="qpl" id="qpl_2" value="2">
+                            <label class="form-check-label" for="qpl_2">2</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="qpl" id="qpl_3" value="3">
+                            <label class="form-check-label" for="qpl_3">3</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="qpl" id="qpl_4" value="4">
+                            <label class="form-check-label" for="qpl_4">4</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="qpl" id="qpl_5" value="5">
+                            <label class="form-check-label" for="qpl_5">5</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="qpl" id="qpl_other" value="other">
+                            <label class="form-check-label" for="qpl_other">Other (Specify)</label>
+                        </div>
+                    </div>
                     <input type="text" class="form-control other-input" id="other_qpl" name="other_qpl" placeholder="Enter QPL">
                 </div>
 
@@ -167,16 +214,14 @@
                     <label for="issue_description">Issue Description:</label>
                     <select class="form-control" id="issue_description" name="issue_description" required>
                         <option value="">Select Issue</option>
-                        {% for section, issues in issue_descriptions.items() %}
-                            <optgroup label="{{ section }}">
-                                {% for issue in issues %}
-                                    <option value="{{ issue }}">{{ issue }}</option>
-                                {% endfor %}
-                            </optgroup>
-                        {% endfor %}
-                        <option value="other">Other (Specify)</option>
+                        <!-- Options will be populated dynamically by JavaScript -->
                     </select>
                     <textarea class="form-control other-input" id="other_issue_description" name="other_issue_description" placeholder="Enter Issue Description" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="image">Upload Image:</label>
+                    <input type="file" class="form-control-file" id="image" name="image" accept="image/*">
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-block">Submit Ticket</button>
@@ -197,30 +242,45 @@
                 allowClear: true
             });
 
-            // Function to toggle visibility of "Other" input
-            function toggleOtherInput(selectElement, inputElement) {
-                selectElement.on('change', function() {
-                    if (this.value === 'other') {
+            const issueDescriptions = {{ issue_descriptions | tojson | safe }};
+
+            function toggleOtherInput(radioName, inputElement) {
+                $(`input[name="${radioName}"]`).on('change', function() {
+                    if (this.value === 'other' && this.checked) {
                         inputElement.show();
                         inputElement.prop('required', true);
                     } else {
                         inputElement.hide();
                         inputElement.prop('required', false);
                     }
-                }).trigger('change'); // Trigger on page load in case a value is pre-selected
+                }).trigger('change');
             }
 
-            // Initialize toggling for each "Other" input
-            toggleOtherInput($('#selected_name'), $('#other_selected_name'));
-            toggleOtherInput($('#line'), $('#other_line'));
-            toggleOtherInput($('#project'), $('#other_project'));
-            toggleOtherInput($('#station'), $('#other_station'));
-            toggleOtherInput($('#qpl'), $('#other_qpl'));
+            toggleOtherInput('selected_name', $('#other_selected_name'));
+            toggleOtherInput('station', $('#other_station'));
+            toggleOtherInput('qpl', $('#other_qpl'));
 
-
-           //Issue Description
+            const stationRadios = $('.station-radio');
             const issueDescriptionSelect = $('#issue_description');
             const otherIssueDescriptionInput = $('#other_issue_description');
+
+            function updateIssueDescriptions() {
+                const selectedStation = $('input[name="station"]:checked').val();
+                issueDescriptionSelect.empty();
+                issueDescriptionSelect.append('<option value="">Select Issue</option>');
+
+                if (selectedStation && selectedStation !== 'other' && issueDescriptions[selectedStation]) {
+                    issueDescriptions[selectedStation].forEach(function(issue) {
+                        issueDescriptionSelect.append(`<option value="${issue}">${issue}</option>`);
+                    });
+                }
+                issueDescriptionSelect.append('<option value="other">Other (Specify)</option>');
+                issueDescriptionSelect.trigger('change');
+            }
+
+            stationRadios.on('change', function() {
+                updateIssueDescriptions();
+            });
 
             issueDescriptionSelect.on('change', function() {
                 if (this.value === 'other') {
@@ -231,6 +291,9 @@
                     otherIssueDescriptionInput.prop('required', false);
                 }
             }).trigger('change');
+
+            // Initial call to set issue descriptions if a station is pre-selected
+            updateIssueDescriptions();
         });
     </script>
 </body>

@@ -1,97 +1,203 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Padget Down Time Alert System</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         body {
-            background-color: #f8f9fa;
-            font-family: 'Arial', sans-serif;
-            /* Use a more modern font */
+            font-family: 'Roboto', sans-serif;
+            background-color: #FFFFFF; /* White background */
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Subtle Overlay (mimicking template lines) */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(244, 162, 97, 0.05) 0%, rgba(255, 193, 7, 0.05) 100%);
+            z-index: 1;
+            opacity: 0.3;
+        }
+
+        /* Blue Line at the top */
+        .blue-line {
+            height: 5px;
+            background-color: #1E90FF; /* Dodger Blue from template */
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 3;
         }
 
         .container {
-            margin-top: 50px;
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 900px;
         }
 
-        .jumbotron {
-            background-color: #ffffff;
-            /* Light background */
-            padding: 2rem 1rem;
+        .glass-card {
+            background: rgba(230, 220, 228, 0.3); /* Light purple tint */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 2px solid rgba(0, 0, 0, 0.1);
             border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            /* Subtle shadow */
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            position: relative;
+            top: 10px; /* Adjust to avoid overlap with blue line */
+        }
+
+        .logo {
+            max-width: 150px;
+            margin-bottom: 1.5rem;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         h1 {
-            color: #343a40;
-            /* Darker, more readable heading */
+            color: #000000; /* Black text */
+            font-weight: 700;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .lead {
-            color: #6c757d;
-            /* Muted lead text */
+            color: #000000; /* Black text */
+            font-size: 1.2rem;
+            font-weight: 300;
+            margin-bottom: 2rem;
         }
 
         hr {
-            border-top: 1px solid #dee2e6;
+            border-top: 2px solid #000000; /* Black line like template */
+            width: 90%;
+            margin: 1.5rem auto;
         }
 
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
-            transition: background-color 0.3s ease;
-            /* Smooth transition */
+        .row {
+            justify-content: center;
         }
 
-        .btn-primary:hover {
-            background-color: #0056b3;
-            /* Darker shade on hover */
-            border-color: #0056b3;
-        }
-
-        .col-md-6 {
+        .col-md-5 {
             margin-bottom: 20px;
-            /* Spacing between columns */
+        }
+
+        .btn-custom {
+            display: inline-flex;
+            align-items: center;
+            background: #F4A261; /* Yellow-orange from template */
+            color: #000000; /* Black text */
+            border: 2px solid #000000; /* Black border */
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            font-weight: 400;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            width: 100%;
+            max-width: 250px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .btn-custom i {
+            margin-right: 8px;
+            font-size: 1.3rem;
+            transition: transform 0.3s ease;
+        }
+
+        .btn-custom:hover {
+            background: #FFC107; /* Brighter yellow accent */
+            border-color: #000000;
+            color: #000000;
+            box-shadow: 0 5px 15px rgba(244, 162, 97, 0.4);
+            transform: translateY(-3px);
+        }
+
+        .btn-custom:hover i {
+            transform: scale(1.1);
         }
 
         h2 {
-            color: #495057;
-            /* Slightly darker heading */
+            color: #000000;
+            font-size: 1.6rem;
+            font-weight: 400;
+            margin-bottom: 5px;
         }
 
         p {
-            color: #545b62;
-            /* Slightly darker paragraph text */
+            color: #000000;
+            font-size: 0.95rem;
+            font-weight: 300;
+        }
+
+        .glass-card {
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Bottom Yellow Lines (mimicking template) */
+        .bottom-lines {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 5px;
+            background: linear-gradient(90deg, #FFC107 0%, #F4A261 50%, #FFC107 100%);
+            border: 1px solid #000000;
         }
     </style>
 </head>
-
 <body>
+    <div class="blue-line"></div>
     <div class="container">
-        <div class="jumbotron">
-            <h1 class="display-4">Welcome to Padget Down Time Alert System</h1>
-            <p class="lead">Please choose an option:</p>
-            <hr class="my-4">
+        <div class="glass-card">
+            <img src="{{ url_for('static', filename='images/padget_logo.png') }}" alt="Padget Logo" class="logo">
+            <h1>Down Time Alert System</h1>
+            <p class="lead">Streamlined Monitoring for Production & Engineering</p>
+            <hr>
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-5">
                     <h2>Production</h2>
-                    <p>Create new tickets.</p>
-                    <a class="btn btn-primary btn-lg" href="{{ url_for('production_login') }}" role="button">Go to
-                        Production</a>
+                    <p>Create and manage downtime tickets</p>
+                    <a class="btn-custom" href="{{ url_for('production_form') }}">
+                        <i class="fas fa-industry"></i> Go to Production
+                    </a>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-5">
                     <h2>Engineering</h2>
-                    <p>Manage and view existing tickets.</p>
-                    <a class="btn btn-primary btn-lg" href="{{ url_for('engineering_login') }}" role="button">Go to
-                        Engineering</a>
+                    <p>Resolve issues and optimize performance</p>
+                    <a class="btn-custom" href="{{ url_for('engineering_login') }}">
+                        <i class="fas fa-tools"></i> Go to Engineering
+                    </a>
                 </div>
             </div>
         </div>
+        <div class="bottom-lines"></div>
     </div>
 </body>
-
 </html>

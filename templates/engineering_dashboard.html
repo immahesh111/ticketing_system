@@ -5,140 +5,269 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Equip Flow Ticket Monitoring</title>
     <style>
-        /* General Styles */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        * {
             margin: 0;
-            background-color: #f4f4f4;
-            color: #333;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: #2d3436;
         }
 
         .container {
             width: 95%;
-            max-width: 1200px;
-            margin: 20px auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 1400px;
+            margin: 30px auto;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .header-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .logo {
+            max-width: 150px;
+            height: auto;
+            position: absolute;
+            left: 0;
         }
 
         h1 {
+            color: #2d3436;
+            font-size: 2.2em;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            background: linear-gradient(to right, #0984e3, #00b894);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             text-align: center;
-            color: #2c3e50;
-            margin-bottom: 20px;
+            width: 100%;
         }
 
-        /* Table Styles */
+        .export-section {
+            margin-bottom: 25px;
+            text-align: right;
+        }
+
+        .export-btn {
+            background: linear-gradient(45deg, #00b894, #0984e3);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 184, 148, 0.4);
+        }
+
         table {
             width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        th, td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
         }
 
         th {
-            background-color: #3498db;
+            background: linear-gradient(45deg, #0984e3, #74b9ff);
             color: white;
-            font-weight: bold;
-        }
-
-        tbody tr:hover {
-            background-color: #f5f5f5;
-        }
-
-        /* Status Styles */
-        .status-open {
-            background-color: #e74c3c; /* Red */
-            color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            display: inline-block;
-        }
-
-        .status-in-progress {
-            background-color: #f39c12; /* Yellow/Orange */
-            color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            display: inline-block;
-        }
-
-        .status-closed {
-            background-color: #2ecc71; /* Green */
-            color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            display: inline-block;
-        }
-
-        /* Link Styles */
-        a {
-            color: #3498db;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        a:hover {
-            text-decoration: underline;
-            color: #2980b9;
-        }
-        /* Additional Styles for a more beautiful look */
-        body {
-            background-color: #ecf0f1; /* Light gray background */
-        }
-
-        .container {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Softer shadow */
-        }
-
-        h1 {
-            color: #34495e; /* Darker, more professional heading color */
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* Subtle text shadow */
-        }
-
-        th {
-            background-color: #2980b9; /* Darker blue for header */
-            text-transform: uppercase; /* Uppercase header text */
-            letter-spacing: 1px; /* Add letter spacing */
+            padding: 15px;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+            font-weight: 600;
         }
 
         td {
-            background-color: #ffffff; /* White background for data cells */
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            transition: background 0.3s ease;
         }
 
-        tbody tr:nth-child(even) {
-            background-color: #f9f9f9; /* Slightly different background for even rows */
+        tbody tr:hover {
+            background: #f8f9fa;
+            transform: scale(1.01);
+        }
+
+        .status-open {
+            background: #d63031;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        .status-in-progress {
+            background: #e17055;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        .status-closed {
+            background: #00b894;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: 500;
         }
 
         a {
-            display: inline-block;
-            padding: 8px 12px;
-            background-color: #3498db;
+            background: #74b9ff;
             color: white;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
+            padding: 8px 15px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
         }
 
         a:hover {
-            background-color: #2980b9;
-            text-decoration: none;
+            background: #0984e3;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(9, 132, 227, 0.3);
+        }
+
+        .date-picker-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(2px);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #fff;
+            margin: 15% auto;
+            padding: 25px;
+            width: 90%;
+            max-width: 450px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-content h3 {
+            color: #2d3436;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .date-input {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            border: 2px solid #dfe6e9;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .date-input:focus {
+            border-color: #0984e3;
+            outline: none;
+            box-shadow: 0 0 5px rgba(9, 132, 227, 0.3);
+        }
+
+        .modal-buttons {
+            margin-top: 25px;
+            text-align: right;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .export-submit {
+            background: linear-gradient(45deg, #0984e3, #74b9ff);
+            color: white;
+        }
+
+        .modal-cancel {
+            background: linear-gradient(45deg, #d63031, #e17055);
+            color: white;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Equip Flow Ticket Monitoring</h1>
+        <div class="header-section">
+            <img src="{{ url_for('static', filename='images/padget_logo.png') }}" alt="Padget Logo" class="logo">
+            <h1>Equip Flow Ticket Monitoring</h1>
+        </div>
+
+        <div class="export-section">
+            <button class="export-btn" onclick="showDatePicker()">Export to Excel</button>
+        </div>
+
+        <div id="datePickerModal" class="date-picker-modal">
+            <div class="modal-content">
+                <h3>Export Date Range</h3>
+                <form id="exportForm">
+                    <label>Start Date:</label>
+                    <input type="date" id="startDate" class="date-input" required>
+                    <label>End Date:</label>
+                    <input type="date" id="endDate" class="date-input" required>
+                    <div class="modal-buttons">
+                        <button type="submit" class="modal-btn export-submit">Export</button>
+                        <button type="button" class="modal-btn modal-cancel" onclick="hideDatePicker()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <table>
             <thead>
                 <tr>
                     <th>Ticket Number</th>
                     <th>Raised By</th>
+                    <th>QPL</th> <!-- Moved before Start Date -->
+                    <th>Station</th> <!-- Moved before Start Date -->
                     <th>Start Date</th>
                     <th>Start Time</th>
                     <th>Status</th>
@@ -147,6 +276,7 @@
                     <th>View</th>
                     <th>Root Cause</th>
                     <th>Corrective Action</th>
+                    <th>Attendant Name</th>
                 </tr>
             </thead>
             <tbody>
@@ -154,6 +284,8 @@
                 <tr>
                     <td>{{ ticket.get('ticket_number') }}</td>
                     <td>{{ ticket.get('raised_by') }}</td>
+                    <td>{{ ticket.get('qpl') or 'N/A' }}</td> <!-- Moved -->
+                    <td>{{ ticket.get('station') or 'N/A' }}</td> <!-- Moved -->
                     <td>{{ ticket.get('start_date') }}</td>
                     <td>{{ ticket.get('start_time_only') }}</td>
                     <td>
@@ -185,10 +317,65 @@
                     <td><a href="{{ url_for('view_ticket', ticket_id=ticket['_id']) }}">View</a></td>
                     <td>{{ ticket.get('root_cause') or 'N/A' }}</td>
                     <td>{{ ticket.get('corrective_action') or 'N/A' }}</td>
+                    <td>{{ ticket.get('attendant_name') or 'N/A' }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        function showDatePicker() {
+            document.getElementById('datePickerModal').style.display = 'block';
+        }
+
+        function hideDatePicker() {
+            document.getElementById('datePickerModal').style.display = 'none';
+        }
+
+        document.getElementById('exportForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const startDate = new Date(document.getElementById('startDate').value);
+            const endDate = new Date(document.getElementById('endDate').value);
+            
+            const headers = [
+                'Ticket Number', 'Raised By', 'QPL', 'Station', 'Start Date', 'Start Time',
+                'Status', 'Closed Time', 'Elapsed Time (Minutes)', 'Root Cause', 
+                'Corrective Action', 'Attendant Name'
+            ];
+            
+            const data = [headers];
+            const rows = document.querySelectorAll('tbody tr');
+            
+            rows.forEach(row => {
+                const cells = row.cells;
+                const ticketDateStr = cells[4].textContent.trim(); // Start Date is now at index 4
+                const ticketDate = new Date(ticketDateStr);
+                
+                if (ticketDate >= startDate && ticketDate <= endDate) {
+                    const rowData = [];
+                    for (let i = 0; i < cells.length; i++) {
+                        if (i !== 9) { // Skip View column (now at index 9)
+                            let cellContent = cells[i].textContent.trim();
+                            if (i === 6) { // Status column is now at index 6
+                                cellContent = cells[i].querySelector('span')?.textContent || cellContent;
+                            }
+                            rowData.push(cellContent);
+                        }
+                    }
+                    data.push(rowData);
+                }
+            });
+            
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            XLSX.utils.book_append_sheet(wb, ws, 'Tickets');
+            XLSX.writeFile(wb, `Tickets_${startDate.toISOString().split('T')[0]}_to_${endDate.toISOString().split('T')[0]}.xlsx`);
+            
+            hideDatePicker();
+        });
+    </script>
 </body>
 </html>
